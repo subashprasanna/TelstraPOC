@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_project"
+    app:startDestination="@id/canadaInfoFragment">
+
+    <fragment
+        android:id="@+id/canadaInfoFragment"
+        android:name="com.cts.telstrapoc.ui.CountryFragment"
+        android:label="canada_info_fragment"
+        tools:layout="@layout/country_detail_fragment" />
+</navigation>
