@@ -13,19 +13,15 @@ Tasks done:
 
 Note: Used below details in this POC to complete the task:
 
-Language              : Kotlin 
-Architecture Pattern  : MVVM Pattern (Used -> Google Jetpack component - ViewModel & LiveData)
-Fetch API             : Retrofit
-API Response converter: Gson
-Thread Mechanism      : Kotlin Coroutines
-ImageLoad             : Glide
-Page Navigation       : Navigation (Google Jetpack component)
-Design Pattern        : Meterial Design
-Refresh Mechanism     : Pull To Refresh
-Dependency Injection  : Dagger2
-Testing logic         : Mockk framework
-Testing UI            : Espresso
-
-
-
-
+1. Language              : Kotlin
+2. Architecture Pattern  : MVVM Pattern (Used -> Google Jetpack component - ViewModel & LiveData)
+3. Fetch API             : Retrofit
+4. API Response converter: Gson
+5. Thread Mechanism      : Kotlin Coroutines
+6. ImageLoad             : Glide
+7. Page Navigation       : Navigation (Google Jetpack component)
+8. Design Pattern        : Meterial Design
+9. Refresh Mechanism     : Pull To Refresh
+10. Dependency Injection  : Dagger2
+11. Testing logic         : Mockk framework
+12. Testing UI            : Espresso
