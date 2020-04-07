@@ -11,51 +11,35 @@
     </data>
 
     <androidx.cardview.widget.CardView
-        android:layout_marginLeft="@dimen/row_margin"
-        android:layout_marginRight="@dimen/row_margin"
-        android:layout_marginTop="@dimen/row_margin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorWhite"
-        app:cardCornerRadius="@dimen/cardview_radius">
+        style="@style/CustomCardView">
 
     <RelativeLayout
-        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin">
 
 
         <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/tv_title"
+            style="@style/TitleTextView"
             android:layout_marginBottom="@dimen/row_margin"
-            android:text="@{info.title}"
-            android:textSize="@dimen/title_size"
-            android:textColor="@color/colorPrimaryDark"
-            android:textStyle="bold" />
+            android:text="@{info.title}"/>
 
         <ImageView
             app:image="@{info.imageHref}"
             android:visibility="@{(info.imageHref == null || info.imageHref.length() == 0) ? View.GONE : View.VISIBLE}"
-            android:id="@+id/imageView"
-            android:layout_width="@dimen/image_size"
-            android:layout_height="@dimen/image_size"
-            android:layout_below="@id/textView"
+            android:id="@+id/img_country"
+            style="@style/CustomImageView"
+            android:layout_below="@id/tv_title"
             android:layout_marginLeft="@dimen/field_space"
-            android:scaleType="fitXY"
             android:layout_alignParentRight="true" />
 
         <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/textView"
-            android:layout_toLeftOf="@id/imageView"
+            android:id="@+id/tv_description"
+            style="@style/ContentTextView"
+            android:layout_below="@id/tv_title"
+            android:layout_toLeftOf="@id/img_country"
             android:layout_alignParentLeft="true"
-            android:textColor="@color/colorBlack"
-            android:textSize="@dimen/description_size"
             android:text="@{info.description}" />
 
 

@@ -17,7 +17,7 @@ object CustomThreadExecutor {
      * callback arg - sends the response back to a class where api called
      *
      */
-    fun <T: Any> runApiOnIOThreadthenMainThread(
+    public fun <T: Any> runApiOnIOThreadthenMainThread(
         work: suspend (() -> T?),
         callback: ((T?) -> Unit)
     ) = CoroutineScope(Dispatchers.Main).launch {

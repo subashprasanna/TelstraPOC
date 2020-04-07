@@ -1,6 +1,11 @@
 package com.cts.telstrapoc.ui
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +23,7 @@ import com.cts.telstrapoc.util.INITIAL_PAGE_TITLE
 import com.cts.telstrapoc.viewmodel.CountryViewModel
 import com.cts.telstrapoc.R
 import com.cts.telstrapoc.di.DaggerDIComponent
+import com.cts.telstrapoc.util.AppUtil
 import kotlinx.android.synthetic.main.country_detail_fragment.*
 import javax.inject.Inject
 
@@ -28,6 +34,25 @@ class CountryFragment : Fragment() {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
+
+    /**
+     *  This app has two ways to check internet connection
+     *  1. Manually call function Util -> AppUtil -> isOnline() Ex: AppUtil.isOnline(context) then call viewModel.getCanadaInfo()
+     *  (or)
+     *  2. Use below broadcast receiver to detect internet connection
+     *  (For easy testing purpose, i have implemented broadcast logic in this fragment)
+     */
+    private var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val isInternetNotConnected = intent.getBooleanExtra(
+                ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)
+            if (isInternetNotConnected) {
+                internetDisconnected()
+            } else {
+                internetConnected()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,12 +73,9 @@ class CountryFragment : Fragment() {
 
         viewModel = ViewModelProviders.of(this, factory).get(CountryViewModel::class.java)
 
-        // Fetch canada country detail
-        viewModel.getCanadaInfo()
-
         // Load canada country detail in UI
         viewModel.countryDetail.observe(viewLifecycleOwner, Observer { detail ->
-            recycler_view_canada.also {
+            recycler_view_country.also {
                 // Set custom actionbar title from canada's api response
                 (activity as AppCompatActivity).supportActionBar?.title = detail.title
 
@@ -62,35 +84,61 @@ class CountryFragment : Fragment() {
         })
 
         // Fetch and load UI on pull to refresh
-        swipeContainer.setOnRefreshListener {
+        pull_to_refresh_container.setOnRefreshListener {
             viewModel.getCanadaInfo()
-            swipeContainer.isRefreshing = false
+            pull_to_refresh_container.isRefreshing = false
         }
     }
 
-    fun initializeViews() {
+    private fun initializeViews() {
         /**
          * Show normal progressbar only once until canada api gives response
          * Once data comes from api pull to refresh handles progressbar
          */
         progressbar_initial.visibility = View.VISIBLE
 
-        recycler_view_canada.also {
+        recycler_view_country.also {
             it.layoutManager = LinearLayoutManager(requireContext())
             it.setHasFixedSize(true)
         }
 
-        swipeContainer.setProgressBackgroundColorSchemeColor(
+        pull_to_refresh_container.setProgressBackgroundColorSchemeColor(
             ContextCompat.getColor(requireContext(),
                 R.color.colorPrimary)
         )
 
-        swipeContainer.setColorSchemeColors(Color.WHITE)
+        pull_to_refresh_container.setColorSchemeColors(Color.WHITE)
     }
 
-    fun setData(canadaDetail: List<CanadaAPIDetailInfo>) {
+    private fun setData(canadaDetail: List<CanadaAPIDetailInfo>) {
+        pull_to_refresh_container.visibility = View.VISIBLE
         progressbar_initial.visibility = View.GONE
-        recycler_view_canada.adapter =
+        recycler_view_country.adapter =
             CountryAdapter(canadaDetail)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Register broadcast receiver for internet connection
+        context?.registerReceiver(broadcastReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Un-Register broadcast receiver for internet connection
+        context?.unregisterReceiver(broadcastReceiver)
+    }
+
+    private fun internetDisconnected() {
+        pull_to_refresh_container.visibility = View.GONE
+        tv_no_internet.visibility = View.VISIBLE
+        progressbar_initial.visibility = View.GONE
+    }
+
+    private fun internetConnected() {
+        pull_to_refresh_container.visibility = View.GONE
+        tv_no_internet.visibility = View.GONE
+        progressbar_initial.visibility = View.VISIBLE
+        viewModel.getCanadaInfo()
     }
 }

@@ -5,9 +5,9 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class APIModule {
+public class APIModule {
     @Provides
-    fun providesAPI() : Api {
+    public fun providesAPI() : Api {
         return Api()
     }
 }

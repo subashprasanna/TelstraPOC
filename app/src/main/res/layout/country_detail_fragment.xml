@@ -4,25 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    tools:context=".ui.CountryFragment">
+    tools:context=".ui.CountryFragment"
+    android:id="@+id/parent_layout">
 
     <ProgressBar
         android:id="@+id/progressbar_initial"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        style="@style/CustomProgressBar"/>
+
+    <TextView
+        android:id="@+id/tv_no_internet"
+        style="@style/GenericMessageTextView"
+        android:visibility="gone"
+        android:text="@string/no_internet"/>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/swipeContainer"
+        android:id="@+id/pull_to_refresh_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="@dimen/row_margin">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_canada"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:id="@+id/recycler_view_country"
+        style="@style/CustomRecyclerView"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
