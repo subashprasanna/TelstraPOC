@@ -1,11 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.cts.telstrapoc.ui
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Color
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,42 +14,28 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cts.telstrapoc.model.CanadaAPIDetailInfo
-import com.cts.telstrapoc.ui.adapter.CountryAdapter
-import com.cts.telstrapoc.util.INITIAL_PAGE_TITLE
-import com.cts.telstrapoc.viewmodel.CountryViewModel
 import com.cts.telstrapoc.R
 import com.cts.telstrapoc.di.DaggerDIComponent
+import com.cts.telstrapoc.model.CanadaAPIDetailInfo
+import com.cts.telstrapoc.ui.adapter.CountryAdapter
 import com.cts.telstrapoc.util.AppUtil
+import com.cts.telstrapoc.util.INITIAL_PAGE_TITLE
+import com.cts.telstrapoc.viewmodel.CountryViewModel
 import kotlinx.android.synthetic.main.country_detail_fragment.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
+@Suppress("DEPRECATION")
 class CountryFragment : Fragment() {
 
     private lateinit var viewModel: CountryViewModel
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
-
-    /**
-     *  This app has two ways to check internet connection
-     *  1. Manually call function Util -> AppUtil -> isOnline() Ex: AppUtil.isOnline(context) then call viewModel.getCanadaInfo()
-     *  (or)
-     *  2. Use below broadcast receiver to detect internet connection
-     *  (For easy testing purpose, i have implemented broadcast logic in this fragment)
-     */
-    private var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val isInternetNotConnected = intent.getBooleanExtra(
-                ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)
-            if (isInternetNotConnected) {
-                internetDisconnected()
-            } else {
-                internetConnected()
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,18 +68,15 @@ class CountryFragment : Fragment() {
 
         // Fetch and load UI on pull to refresh
         pull_to_refresh_container.setOnRefreshListener {
-            viewModel.getCanadaInfo()
+            loadAPIData()
             pull_to_refresh_container.isRefreshing = false
         }
+
+        // check internet connection and load data
+        loadAPIData()
     }
 
     private fun initializeViews() {
-        /**
-         * Show normal progressbar only once until canada api gives response
-         * Once data comes from api pull to refresh handles progressbar
-         */
-        progressbar_initial.visibility = View.VISIBLE
-
         recycler_view_country.also {
             it.layoutManager = LinearLayoutManager(requireContext())
             it.setHasFixedSize(true)
@@ -110,6 +90,13 @@ class CountryFragment : Fragment() {
         pull_to_refresh_container.setColorSchemeColors(Color.WHITE)
     }
 
+    private fun loadAPIData() {
+        progressbar_initial.visibility = View.VISIBLE
+        tv_no_internet.visibility = View.GONE
+
+        if (AppUtil.isOnline(context)) checkURLAndCallAPI() else internetDisconnected()
+    }
+
     private fun setData(canadaDetail: List<CanadaAPIDetailInfo>) {
         pull_to_refresh_container.visibility = View.VISIBLE
         progressbar_initial.visibility = View.GONE
@@ -117,28 +104,29 @@ class CountryFragment : Fragment() {
             CountryAdapter(canadaDetail)
     }
 
-    override fun onStart() {
-        super.onStart()
-        // Register broadcast receiver for internet connection
-        context?.registerReceiver(broadcastReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // Un-Register broadcast receiver for internet connection
-        context?.unregisterReceiver(broadcastReceiver)
-    }
-
     private fun internetDisconnected() {
-        pull_to_refresh_container.visibility = View.GONE
+        pull_to_refresh_container.visibility = View.VISIBLE
         tv_no_internet.visibility = View.VISIBLE
         progressbar_initial.visibility = View.GONE
+        setData(listOf<CanadaAPIDetailInfo>())
     }
 
     private fun internetConnected() {
         pull_to_refresh_container.visibility = View.GONE
         tv_no_internet.visibility = View.GONE
-        progressbar_initial.visibility = View.VISIBLE
         viewModel.getCanadaInfo()
+    }
+
+
+
+    fun checkURLAndCallAPI() {
+        // Check url is reachable from background IO thread
+        GlobalScope.launch(Dispatchers.IO) {
+            val check = AppUtil.checkURLReachable()
+            // Update the ui from main thread
+            withContext(Dispatchers.Main) {
+                if (check) internetConnected() else internetDisconnected()
+            }
+        }
     }
 }

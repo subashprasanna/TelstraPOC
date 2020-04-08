@@ -2,14 +2,13 @@ package com.cts.telstrapoc
 
 import com.cts.telstrapoc.model.CanadaAPIDetail
 import com.cts.telstrapoc.model.CanadaAPIDetailInfo
-import retrofit2.Response
 
 class ApiResponse {
     companion object {
         fun getSampleResponse() : CanadaAPIDetail {
             val title = "About Canada"
             val list : MutableList<CanadaAPIDetailInfo> = mutableListOf()
-            list.add(CanadaAPIDetailInfo("", "", "Beavers"))
+            list.add(CanadaAPIDetailInfo(description = "", imageHref = "", title = "Beavers"))
             list.add(CanadaAPIDetailInfo("", "", "Flag"))
             list.add(CanadaAPIDetailInfo("", "", "Transportation"))
             list.add(CanadaAPIDetailInfo("", "", "Hockey Night in Canada"))

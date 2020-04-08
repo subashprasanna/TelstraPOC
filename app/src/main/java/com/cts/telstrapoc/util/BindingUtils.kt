@@ -4,6 +4,7 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import java.lang.Exception
 
 /**
  * Binding Adapter helps to create custom attribute
@@ -12,16 +13,19 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
  */
 
 @BindingAdapter("image")
-public fun loadImage(view: ImageView, url: String?) {
+fun loadImage(view: ImageView, url: String?) {
     // Add below commented lines if you do not want to cache image
     // .apply(RequestOptions.skipMemoryCacheOf(true))
     // .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
 
     // set diskCacheStrategy if you want to cache image
     // DiskCacheStrategy.RESOURCE = often and resize image caching mechanism. Suits our requirement.
+    try {
         Glide.with(view)
             .load(url)
             .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
             .into(view)
-
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }

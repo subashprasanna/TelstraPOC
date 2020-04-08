@@ -2,13 +2,11 @@ package com.cts.telstrapoc.model.network
 
 import com.cts.telstrapoc.ApiResponse
 import com.cts.telstrapoc.model.CanadaAPIDetail
-import com.cts.telstrapoc.model.CanadaAPIDetailInfo
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
@@ -31,7 +29,7 @@ class APIExecutorTest {
         coEvery{ apiExecutor.executeAPI(sampleMock)}.answers { ApiResponse.getSampleResponse() }
 
         // When
-        val response  = runBlocking {
+        runBlocking {
             apiExecutor.executeAPI(sampleMock)
         }
 

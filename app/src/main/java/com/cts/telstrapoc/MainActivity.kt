@@ -2,7 +2,6 @@ package com.cts.telstrapoc
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.cts.telstrapoc.R
 
 class MainActivity : AppCompatActivity() {
 

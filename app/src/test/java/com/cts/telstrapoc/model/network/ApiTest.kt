@@ -1,9 +1,11 @@
 package com.cts.telstrapoc.model.network
 
-import com.cts.telstrapoc.ApiResponse
 import com.cts.telstrapoc.model.CanadaAPIDetail
 import com.cts.telstrapoc.model.CanadaAPIDetailInfo
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test

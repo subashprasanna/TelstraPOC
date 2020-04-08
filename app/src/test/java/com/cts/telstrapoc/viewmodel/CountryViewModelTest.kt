@@ -1,23 +1,20 @@
 package com.cts.telstrapoc.viewmodel
 
 import com.cts.telstrapoc.ApiResponse
-import com.cts.telstrapoc.model.CanadaAPIDetail
-import com.cts.telstrapoc.model.CanadaAPIDetailInfo
 import com.cts.telstrapoc.model.repository.CountryRepository
 import io.mockk.MockKAnnotations
-import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
-import io.mockk.verify
-import junit.framework.Assert.*
-import kotlinx.coroutines.*
+import junit.framework.Assert.assertNotNull
+import junit.framework.Assert.assertTrue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import java.io.IOException
 
 class CountryViewModelTest {
     @RelaxedMockK
