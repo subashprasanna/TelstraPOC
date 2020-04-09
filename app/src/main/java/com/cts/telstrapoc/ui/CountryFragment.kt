@@ -105,8 +105,10 @@ class CountryFragment : Fragment() {
 
     private fun setData(canadaDetail: List<CanadaAPIDetailInfo>) {
         showDataHideExtraFields()
-        recycler_view_country.adapter =
-            CountryAdapter(canadaDetail)
+        if(recycler_view_country != null) {
+            recycler_view_country.adapter =
+                CountryAdapter(canadaDetail)
+        }
     }
 
     private fun internetDisconnected() {
@@ -115,7 +117,6 @@ class CountryFragment : Fragment() {
     }
 
     private fun internetConnected() {
-        showDataHideExtraFields()
         viewModel.getCanadaInfo()
     }
 

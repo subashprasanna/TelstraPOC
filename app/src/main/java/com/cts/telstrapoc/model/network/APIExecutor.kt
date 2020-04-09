@@ -2,6 +2,7 @@ package com.cts.telstrapoc.model.network
 
 import retrofit2.Response
 import java.io.IOException
+import java.lang.Exception
 
 abstract class APIExecutor {
     /**
@@ -9,13 +10,19 @@ abstract class APIExecutor {
      * It takes function as parameter and return api response as generic type
      */
     suspend fun<T: Any> executeAPI(call: suspend () -> Response<T>) : T {
-        val response = call.invoke()
+        try {
+            val response = call.invoke()
 
-        if (response.isSuccessful) {
-            return response.body()!!
-        } else {
+            if (response.isSuccessful) {
+                return response.body()!!
+            } else {
+                throw APIException(
+                    response.code().toString()
+                )
+            }
+        } catch (e: Exception){
             throw APIException(
-                response.code().toString()
+                e.message.toString()
             )
         }
     }

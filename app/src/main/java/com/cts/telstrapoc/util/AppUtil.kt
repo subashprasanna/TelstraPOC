@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.cts.telstrapoc.util
 
 import android.content.Context
