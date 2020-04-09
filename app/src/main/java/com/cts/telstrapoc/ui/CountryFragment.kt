@@ -67,9 +67,11 @@ class CountryFragment : Fragment() {
         })
 
         // Fetch and load UI on pull to refresh
-        pull_to_refresh_container.setOnRefreshListener {
-            loadAPIData()
-            pull_to_refresh_container.isRefreshing = false
+        if(pull_to_refresh_container != null) {
+            pull_to_refresh_container.setOnRefreshListener {
+                loadAPIData()
+                pull_to_refresh_container.isRefreshing = false
+            }
         }
 
         // check internet connection and load data
@@ -77,46 +79,64 @@ class CountryFragment : Fragment() {
     }
 
     private fun initializeViews() {
-        recycler_view_country.also {
-            it.layoutManager = LinearLayoutManager(requireContext())
-            it.setHasFixedSize(true)
+        if (recycler_view_country != null) {
+            recycler_view_country.also {
+                it.layoutManager = LinearLayoutManager(requireContext())
+                it.setHasFixedSize(true)
+            }
         }
 
-        pull_to_refresh_container.setProgressBackgroundColorSchemeColor(
-            ContextCompat.getColor(requireContext(),
-                R.color.colorPrimary)
-        )
+        if (pull_to_refresh_container != null) {
+            pull_to_refresh_container.setProgressBackgroundColorSchemeColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.colorPrimary
+                )
+            )
 
-        pull_to_refresh_container.setColorSchemeColors(Color.WHITE)
+            pull_to_refresh_container.setColorSchemeColors(Color.WHITE)
+        }
     }
 
     private fun loadAPIData() {
-        progressbar_initial.visibility = View.VISIBLE
-        tv_no_internet.visibility = View.GONE
-
+        showProgressBarWhileFetchingData()
         if (AppUtil.isOnline(context)) checkURLAndCallAPI() else internetDisconnected()
     }
 
     private fun setData(canadaDetail: List<CanadaAPIDetailInfo>) {
-        pull_to_refresh_container.visibility = View.VISIBLE
-        progressbar_initial.visibility = View.GONE
+        showDataHideExtraFields()
         recycler_view_country.adapter =
             CountryAdapter(canadaDetail)
     }
 
     private fun internetDisconnected() {
-        pull_to_refresh_container.visibility = View.VISIBLE
-        tv_no_internet.visibility = View.VISIBLE
-        progressbar_initial.visibility = View.GONE
         setData(listOf<CanadaAPIDetailInfo>())
+        showNoInternetMessage()
     }
 
     private fun internetConnected() {
-        pull_to_refresh_container.visibility = View.GONE
-        tv_no_internet.visibility = View.GONE
+        showDataHideExtraFields()
         viewModel.getCanadaInfo()
     }
 
+    fun showProgressBarWhileFetchingData() {
+        if(progressbar_initial != null) progressbar_initial.visibility = View.VISIBLE
+        if (pull_to_refresh_container != null) pull_to_refresh_container.visibility = View.GONE
+        if(tv_no_internet != null) tv_no_internet.visibility = View.GONE
+    }
+
+    fun showNoInternetMessage() {
+        if (tv_no_internet != null) tv_no_internet.visibility = View.VISIBLE
+        // show pull to refresh to check internet connection again
+        if (pull_to_refresh_container != null) pull_to_refresh_container.visibility = View.VISIBLE
+        if (progressbar_initial != null) progressbar_initial.visibility = View.GONE
+    }
+
+    fun showDataHideExtraFields() {
+        if(pull_to_refresh_container != null) pull_to_refresh_container.visibility = View.VISIBLE
+        if (tv_no_internet != null) tv_no_internet.visibility = View.GONE
+        if(progressbar_initial != null) progressbar_initial.visibility = View.GONE
+    }
 
 
     fun checkURLAndCallAPI() {
