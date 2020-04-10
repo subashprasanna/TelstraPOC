@@ -10,19 +10,13 @@ abstract class APIExecutor {
      * It takes function as parameter and return api response as generic type
      */
     suspend fun<T: Any> executeAPI(call: suspend () -> Response<T>) : T {
-        try {
-            val response = call.invoke()
+        val response = call.invoke()
 
-            if (response.isSuccessful) {
-                return response.body()!!
-            } else {
-                throw APIException(
-                    response.code().toString()
-                )
-            }
-        } catch (e: Exception){
+        if (response.isSuccessful) {
+            return response.body()!!
+        } else {
             throw APIException(
-                e.message.toString()
+                response.code().toString()
             )
         }
     }

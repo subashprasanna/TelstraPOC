@@ -22,10 +22,7 @@ import com.cts.telstrapoc.util.AppUtil
 import com.cts.telstrapoc.util.INITIAL_PAGE_TITLE
 import com.cts.telstrapoc.viewmodel.CountryViewModel
 import kotlinx.android.synthetic.main.country_detail_fragment.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 
@@ -50,9 +47,15 @@ class CountryFragment : Fragment() {
         // Set default actionbar title
         (activity as AppCompatActivity).supportActionBar?.title = INITIAL_PAGE_TITLE
 
-        initializeViews()
-
         DaggerDIComponent.create().inject(this)
+
+        checkInternetConnection()
+    }
+
+    private fun checkInternetConnection() = if (AppUtil.isOnline(context)) checkURLAndCallAPI() else showNoInternetMessage()
+
+    private fun loadPageData() {
+        initializeViews()
 
         viewModel = ViewModelProviders.of(this, factory).get(CountryViewModel::class.java)
 
@@ -69,7 +72,7 @@ class CountryFragment : Fragment() {
         // Fetch and load UI on pull to refresh
         if(pull_to_refresh_container != null) {
             pull_to_refresh_container.setOnRefreshListener {
-                loadAPIData()
+                checkInternetConnection()
                 pull_to_refresh_container.isRefreshing = false
             }
         }
@@ -100,7 +103,7 @@ class CountryFragment : Fragment() {
 
     private fun loadAPIData() {
         showProgressBarWhileFetchingData()
-        if (AppUtil.isOnline(context)) checkURLAndCallAPI() else internetDisconnected()
+        viewModel.getCanadaInfo()
     }
 
     private fun setData(canadaDetail: List<CanadaAPIDetailInfo>) {
@@ -111,15 +114,6 @@ class CountryFragment : Fragment() {
         }
     }
 
-    private fun internetDisconnected() {
-        setData(listOf<CanadaAPIDetailInfo>())
-        showNoInternetMessage()
-    }
-
-    private fun internetConnected() {
-        viewModel.getCanadaInfo()
-    }
-
     fun showProgressBarWhileFetchingData() {
         if(progressbar_initial != null) progressbar_initial.visibility = View.VISIBLE
         if (pull_to_refresh_container != null) pull_to_refresh_container.visibility = View.GONE
@@ -128,8 +122,7 @@ class CountryFragment : Fragment() {
 
     fun showNoInternetMessage() {
         if (tv_no_internet != null) tv_no_internet.visibility = View.VISIBLE
-        // show pull to refresh to check internet connection again
-        if (pull_to_refresh_container != null) pull_to_refresh_container.visibility = View.VISIBLE
+        if (pull_to_refresh_container != null) pull_to_refresh_container.visibility = View.GONE
         if (progressbar_initial != null) progressbar_initial.visibility = View.GONE
     }
 
@@ -139,14 +132,13 @@ class CountryFragment : Fragment() {
         if(progressbar_initial != null) progressbar_initial.visibility = View.GONE
     }
 
-
     fun checkURLAndCallAPI() {
         // Check url is reachable from background IO thread
         GlobalScope.launch(Dispatchers.IO) {
             val check = AppUtil.checkURLReachable()
             // Update the ui from main thread
             withContext(Dispatchers.Main) {
-                if (check) internetConnected() else internetDisconnected()
+                if (check) loadPageData() else showNoInternetMessage()
             }
         }
     }
